@@ -60,8 +60,8 @@ app.get('/api/v1/renn/:year', (req, res) => {
         client.close();
       });
 });
-
-app.listen(3000, () => console.log('Example app listening on port 3000!'));
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 const findCollections = (db, collectionName, callback) => {
     // Get the documents collection
