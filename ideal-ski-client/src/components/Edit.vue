@@ -8,6 +8,7 @@
 
        <label>Start number</label>
        <input type="number" placeholder="Startnumber" v-model="skier.startNumber" >
+    <a v-on:click="deleteClick">Slett</a>
 
     <a v-on:click="click">Lukk</a>
 
@@ -22,13 +23,20 @@ methods: {
     click() {
         this.$emit('edit', 
         {
-          firstName: this.firstName, 
-          lastName: this.lastName, 
-          startNumber: this.startNumber
+          firstName: this.skier.firstName, 
+          lastName: this.skier.lastName, 
+          startNumber: this.skier.startNumber
           }, this.index);
         // this.startNumber = Number(this.startNumber) + 1;
         // this.firstName = '';
         // this.lastName = '';
+    },
+    deleteClick() {
+      this.$emit('delete', {
+          firstName: this.skier.firstName, 
+          lastName: this.skier.lastName, 
+          startNumber: this.skier.startNumber
+          });
     }
   }
 }

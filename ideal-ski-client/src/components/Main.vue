@@ -5,6 +5,8 @@
       <sui-menu-item><a class="menu" v-on:click="highscoreClick">Highscore</a></sui-menu-item>
       <sui-menu-item><input type="checkbox" v-model="register" id="reg" class="menu"><label for="reg">Registrering</label></sui-menu-item>
       <sui-menu-item><span style="float: right; margin:2px">{{time}}</span></sui-menu-item>
+      <sui-menu-item><input type="text" v-model="year" /></sui-menu-item>
+      <sui-menu-item><a class="menu" v-on:click="saveClick">Lagre</a></sui-menu-item>      
   </sui-menu>
   <table v-if="mode == 'run'">
     <thead>
@@ -27,7 +29,7 @@
     </table>
      <Register v-if="register" v-on:register="addSkier"/>
      <Highscore v-if="mode == 'highscore'" :skiers="skiersSorted" />
-     <Edit v-if="edit" :skier="selectedSkier" :index="selectedSkierIndex" v-on:edit="updateSkier" />
+     <Edit v-if="edit" :skier="selectedSkier" :index="selectedSkierIndex" v-on:delete="deleteSkier" v-on:edit="updateSkier" />
   </div>
 </template>
 
@@ -36,6 +38,8 @@ import Skier from "@/components/Skier";
 import Register from "@/components/Register";
 import Highscore from "@/components/Highscore";
 import Edit from "@/components/Edit";
+
+import axios from 'axios';
 
 export default {
   name: "Main",
@@ -58,6 +62,14 @@ export default {
       this.skiers = newSkiers;
       this.edit = false;
     },
+    deleteSkier(skier) {
+      let newSkiers = this.skiers.slice(0);
+      const skierIndex = this.findSkierIndex(skier);
+      console.log(skierIndex);
+      newSkiers.splice(skierIndex, 1);
+      this.skiers = newSkiers;
+      this.edit = false;
+    },
     editSkier(skier, index) {
       this.selectedSkier = skier;
       this.selectedSkierIndex = index;
@@ -65,9 +77,16 @@ export default {
     },
     highscoreClick() {
       this.mode = "highscore";
+    },
+    saveClick() {
+      axios.post('api/v1/renn', {year: this.year, skiers: this.skiers});
     }
   },
   mounted() {
+    axios.get('api/v1/renn/2018').then((response) => {
+      console.log(response);
+      this.skiers = response.data.skiers;
+    });
     setInterval(() => {
       this.now = Math.round(new Date().valueOf() / 1000);
       this.time = new Date().toLocaleTimeString("it-IT");
@@ -86,53 +105,13 @@ export default {
     return {
       time: "00:00:00",
       now: new Date().valueOf(),
+      year: 2018,
       mode: "run",
       register: false,
       edit: false,
       selectedSkier: null,
       selectedSkierIndex: 0,
-      skiers: [
-        { firstName: "Kristian Mehus", state: 0, startNumber: 99999 },
-        { firstName: "Jan Olav Fredriksen", state: 0, startNumber: 99999 },
-        { firstName: "Eira Kristine Håkonsen", state: 0, startNumber: 99999 },
-        { firstName: "Berit Olsen", state: 0, startNumber: 99999 },
-        { firstName: "Kjersti Haugen", state: 0, startNumber: 99999 },
-        { firstName: "Lars Håkonsen", state: 0, startNumber: 99999 },
-        { firstName: "Andreas Mehus", state: 0, startNumber: 99999 },
-        { firstName: "Ragnar Niemi Berg", state: 0, startNumber: 99999 },
-        { firstName: "Marius Lehnes", state: 0, startNumber: 99999 },
-        { firstName: "Tor Hansen", state: 0, startNumber: 99999 },
-        { firstName: "Birgit Solem", state: 0, startNumber: 99999 },
-        { firstName: "Emilie Hogstad Haugen", state: 0, startNumber: 99999 },
-        { firstName: "Maiken Lehnes", state: 0, startNumber: 99999 },
-        { firstName: "Hege Rustad", state: 0, startNumber: 99999 },
-        { firstName: "Markus Solem", state: 0, startNumber: 99999 },
-        { firstName: "Magnus Håkonsen", state: 0, startNumber: 99999 },
-        { firstName: "Håvard Bakka", state: 0, startNumber: 99999 },
-        { firstName: "Håkon Rustad", state: 0, startNumber: 99999 },
-        { firstName: "Bjørn Hervik", state: 0, startNumber: 99999 },
-        { firstName: "Bjørg Bakka", state: 0, startNumber: 99999 },
-        { firstName: "Mari Ono", state: 0, startNumber: 99999 },
-        { firstName: "Ida Sofie Dahl", state: 0, startNumber: 99999 },
-        { firstName: "Petter Mehus", state: 0, startNumber: 99999 },
-        { firstName: "Iver Rustad", state: 0, startNumber: 99999 },
-        { firstName: "Helena Solem", state: 0, startNumber: 99999 },
-        { firstName: "Annie Dahl", state: 0, startNumber: 99999 },
-        { firstName: "Magne Lehnes", state: 0, startNumber: 99999 },
-        { firstName: "Kjetil Dahl", state: 0, startNumber: 99999 },
-        { firstName: "Gunnar Lindbeck", state: 0, startNumber: 99999 },
-        { firstName: "Tobias H Halvorsen", state: 0, startNumber: 99999 },
-        { firstName: "Trine & Elias Hogstad", state: 0, startNumber: 99999 },
-        { firstName: "Per Åge Kjerneli", state: 0, startNumber: 99999 },
-        { firstName: "Kristine Dahl", state: 0, startNumber: 99999 },
-        { firstName: "Anders Ono", state: 0, startNumber: 99999 },
-        { firstName: "Oliver H Halvorsen", state: 0, startNumber: 99999 },
-        { firstName: "Birk Bakka", state: 0, startNumber: 99999 },
-        { firstName: "Ingrid Ono", state: 0, startNumber: 99999 },
-        { firstName: "Tina Akerholt", state: 0, startNumber: 99999 },
-        { firstName: "Gerd Berget", state: 0, startNumber: 99999 },
-        { firstName: "Sara Madelen Mathiesen", state: 0, startNumber: 99999 }
-      ]
+      skiers: []
     };
   }
 };

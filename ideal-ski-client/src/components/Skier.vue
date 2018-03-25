@@ -72,13 +72,11 @@ export default {
         case 0:
           startTime = undefined;
           this.$emit("update", { firstName: this.skier.firstName, startTime, state });
-
           break;
         case 1:
           startTime = Math.round(new Date().valueOf()/1000);
           roundTime = undefined;
           this.$emit("update", { firstName: this.skier.firstName, startTime, roundTime, state });
-
           break;
         case 2:
           roundTime = Math.round(new Date().valueOf()/1000);

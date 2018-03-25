@@ -1,24 +1,18 @@
 {
-  "name": "ideal-ski",
+  "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "engines": {
-    "node": "6.11.1",
-    "npm": "2.1.x"
-  },
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server/server.js"
+    "serve": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/doucheberg/ideal-ski.git"
-  },
-  "author": "Håkon N. Berg",
+  "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/doucheberg/ideal-ski/issues"
-  },
-  "homepage": "https://github.com/doucheberg/ideal-ski#readme"
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "mongodb": "^3.0.5",
+    "nodemon": "^1.17.2"
+  }
 }
