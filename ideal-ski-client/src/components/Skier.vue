@@ -1,5 +1,5 @@
 <template>
-  <tr style="margin: 2px;" class="avatar">
+  <tr style="margin: 2px;" class="avatar" :class="stateCss">
       <td>
         <h5 style="white-space: nowrap; font-size: 90%;">{{skier.startNumber}}</h5>
       </td>
@@ -236,17 +236,20 @@ input {
   display: inline-block;
   text-align: center
 }
-.yellow {
+a.yellow {
   background-color: rgb(126, 126, 126);
 }
-.blue {
+a.blue {
   background-color: rgb(0, 110, 255);
 }
-.red {
+a.red {
   background-color: rgb(216, 34, 21);
 }
-.green {
+a.green {
   background-color: green;
+}
+tr.green {
+  background-color: lightgreen;
 }
 div {
   font-size: 90%;
