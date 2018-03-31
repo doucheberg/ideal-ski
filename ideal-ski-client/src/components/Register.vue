@@ -1,9 +1,7 @@
 <template>
   <div class="dark">
-      <label>First Name</label>
+      <label>Name</label>
       <input placeholder="First Name" v-model="firstName" >
-      <label>Last Name</label>
-      <input placeholder="Last Name" v-model="lastName" >
        <label>Start number</label>
        <input type="number" placeholder="Startnumber" v-model="startNumber" >
       <a v-on:click="click">Add</a>
@@ -46,7 +44,7 @@ methods: {
   background-color: #333;
   color: white;
   margin: 4px;
-  padding: 2px;
+  padding: 8px;
   position: fixed;
   top: 30px;
 }

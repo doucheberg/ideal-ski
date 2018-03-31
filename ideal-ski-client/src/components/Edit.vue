@@ -1,10 +1,7 @@
 <template>
   <div class="dark">
-      <label>First Name</label>
+      <label>Name</label>
       <input placeholder="First Name" v-model="skier.firstName" >
-
-      <label>Last Name</label>
-      <input placeholder="Last Name" v-model="skier.lastName" >
 
        <label>Start number</label>
        <input type="number" placeholder="Startnumber" v-model="skier.startNumber" >
