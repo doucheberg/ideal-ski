@@ -1,13 +1,11 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const MongoClient = require('mongodb').MongoClient;
 
-const dbString = "mongodb://paske:StoredInGithubCode2018!@ds033986.mlab.com:33986/paske";
+const db = require('./db');
 
 const dbName = "paske";
 const collectionName = "renn";
-//app.get('/', (req, res) => res.send('Hello World!'));
 app.use(express.static('dist'));
 
 app.use(bodyParser.urlencoded({
@@ -16,7 +14,35 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 app.get('/api', (req, res) => {
-    res.send(new Date().toString());
+    res.send(`Time is ${new Date().toString()}`);
+});
+
+app.get('/api/users/:year', (req, res) => {
+  const year = Number(req.params["year"]) || 2018;
+  db.once('open')
+});
+
+app.get('/api/skiers', async (req, res) => {
+  const skiers = await db.Skier.find();
+  res.send(skiers);
+});
+app.post('/api/skiers', async (req, res) => {
+  const skier = await new db.Skier(req.body).save();
+  res.send(skier);
+});
+app.delete('/api/skiers/:id', async (req, res) => {
+  await db.Skier.deleteOne({_id: req.params.id});
+  res.send('Deleted');
+});
+
+app.post('/api/races', async (req, res) => {
+  const race = await new db.Race(req.body).save();
+  res.send(race);
+});
+
+app.get('/api/races', async (req, res) => {
+  const races = await db.Race.find();
+  res.send(races);
 });
 
 app.get('/api/v1/renn', (req, res) => {
