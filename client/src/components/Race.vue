@@ -2,22 +2,26 @@
 <div>
   <v-content>
     <v-container fluid>
-      <md-content>
         <v-progress-linear v-if="loading" :indeterminate="true"></v-progress-linear>
         <table>
           <tr>
-            <th>Startnr</th>
+            <th><a @click="sort = 'nr'">Startnr</a></th>
+            <th><a @click="sort = 'diff'">Pos</a></th>
+             <th><a @click="sort = 'diff'">Idealtid</a></th>
             <th>Navn</th>
             <th>Status</th>
             <th>Runde 1</th>
             <th>Runde 2</th>
-            <th>Idealtid</th>
+           
             <th>Start</th>
             <th>Runde</th>
             <th>Mål</th>
+            <th></th>
           </tr>
           <tr v-for="(skier) in skiers" v-bind:key="skier._id" :class="`state-${skier.state}`">
             <td>{{skier.startNumber}}</td>
+            <td>{{skier.position}}</td>
+             <td>{{skier.diff}}</td>
             <td>{{skier.name}}</td>
             <td>
               <v-btn small color="primary" @click="next(skier)">{{stateText(skier.state)}}</v-btn>
@@ -31,13 +35,17 @@
             <td>
               {{skier.state == 2 ? calculateSecs(skier.roundTime, now.valueOf()) : skier.r2}}
             </td>
-            <td>{{skier.diff}}</td>
+           
             <td>{{skier.startTime ? new Date(skier.startTime).toLocaleTimeString() : '-' }}</td>
             <td>{{skier.roundTime ? new Date(skier.roundTime).toLocaleTimeString() : '-' }}</td>
             <td>{{skier.endTime ? new Date(skier.endTime).toLocaleTimeString() : '-' }}</td>
+            <td>
+              <v-btn small flat icon @click="remove(skier)">
+                <v-icon>clear</v-icon>
+              </v-btn>
+            </td>
           </tr>
         </table>
-      </md-content>
     </v-container>
   </v-content>
   </div>
@@ -63,6 +71,26 @@
       }, 333);
     },
     methods: {
+      updatePositions(){
+        let count = 0;
+        let pos = 0;
+        let prevDiff = -1;
+        let samePos = 0;
+        this.racingSkiers.sort((a, b) => a.diff - b.diff).forEach(skier => {
+          const skierDiff = parseInt(skier.diff);
+          if(skierDiff === prevDiff){
+            samePos = samePos + 1;
+            skier.position = pos;
+          }
+          else {
+            pos = pos + samePos + 1;
+            samePos = 0;
+            skier.position = pos + samePos;
+          }
+          prevDiff = skierDiff;
+        });
+      },
+
       stateText(state) {
         switch (state) {
           case 0:
@@ -132,7 +160,12 @@
             break;
         }
         this.updateStats(skier);
+        this.updatePositions();
       },
+
+      remove(skier){
+        this.$emit('removeSkier', skier);
+      }
     },
     computed: {
       skiers() {
