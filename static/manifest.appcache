@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# 27404aaeecc68d5546a1
+# v3
 
 /css/app.1f4f9050.css
 /js/app.cf687777.js
@@ -9,9 +9,3 @@ CACHE MANIFEST
 /js/chunk-vendors.e28f21f6.js.map
 /index.html
 /favicon.ico
-
-CACHE:
-*
-
-NETWORK:
-*
