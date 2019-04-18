@@ -1,6 +1,7 @@
 var AppCachePlugin = require('appcache-webpack-plugin');
 var manifest = new AppCachePlugin({
   cache: ['*'],
+  network: ['*'],
   fallback: [],
   output: 'manifest.appcache'
 })
