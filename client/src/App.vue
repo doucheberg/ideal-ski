@@ -7,11 +7,11 @@
         </v-btn>
         <v-toolbar-title>Idealski</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-text-field v-model="selectedRace.name"/>
+        <v-text-field v-model="selectedRace.name" @change="setCachedRace"/>
         <v-spacer></v-spacer>
         <v-toolbar-title>{{formatDate}}</v-toolbar-title>
       </v-toolbar>
-      <router-view @removeSkier="removeSkier" :racingSkiers="selectedRace.skiers"></router-view>
+      <router-view @saveState="saveCache" @removeSkier="removeSkier" :racingSkiers="selectedRace.skiers"></router-view>
       <v-dialog v-model="editDialog" max-width="800px">
         <v-card>
           <v-card-title>
@@ -20,6 +20,44 @@
           <v-card-text>
             <v-container grid-list-md>
               <v-layout wrap>
+                <v-flex xs12>
+                  <table>
+                    <thead>
+                      <tr>
+                      <th colspan="4">
+                        Add skiers
+                      </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                      <td>
+                    <v-text-field v-model="startNumber"/>
+                      </td>
+                  <td>
+                    <v-combobox
+                      :items="availableSkiers"
+                      label="Search user"
+                      item-text="name"
+                      item-value="name"
+                      v-model="addUser"
+                      clearable
+                    />
+                  </td>
+                  <td>
+                    <v-text-field v-if="!addUser || typeof(addUser) === 'string'" label="Manual enter" v-model="addUser"></v-text-field>
+                  </td>
+                  <td>
+                    <v-btn color="info" @click="this.addUserToRace">Add</v-btn>
+                  </td>
+                    </tr>
+                    </tbody>
+                    </table>
+                </v-flex>
+                <v-flex xs12>
+                   <v-btn color="info" @click="updateCache">Syncronize offline cache and server</v-btn>
+                   <v-btn color="error" @click="clearCache">Clear local cache</v-btn>
+                </v-flex>
                 <v-select
                   v-model="id"
                   :items="races"
@@ -37,31 +75,7 @@
                   <v-btn color="error" @click="deleteRace">Delete race</v-btn>
                   <v-btn color="success" @click="newRace">New race</v-btn>
                   <v-btn color="info" @click="this.saveRace">Save</v-btn>
-                </v-flex>
-                <v-flex xs12>
-                  <table>
-                    <tr>
-                      <td>
-                    <v-input/>
-                      </td>
-                  <td>
-
-                    <v-combobox
-                      :items="availableSkiers"
-                      label="Search user"
-                      item-text="name"
-                      item-value="name"
-                      v-model="addUser"
-                      clearable
-                    />
-                  </td>
-                  <td>
-                    <v-text-field v-if="!addUser || typeof(addUser) === 'string'" label="Manual enter" v-model="addUser"></v-text-field>
-                  </td>
-                  <td>
-                    <v-btn color="info" @click="this.addUserToRace">Add</v-btn>
-                  </td>
-                    </tr></table>
+                  <v-btn color="info" @click="this.setCachedRace">Set race as offline race</v-btn>
                 </v-flex>
               </v-layout>
             </v-container>
@@ -95,7 +109,8 @@ const router = new VueRouter({
     }
   ]
 });
-import axios from "axios";
+
+import data from './data';
 
 export default {
   name: "app",
@@ -106,13 +121,16 @@ export default {
       addUser: "",
       id: null,
       availableSkiers: [],
+      cachedRace: null,
       races: [],
-      editDialog: false
+      editDialog: false,
+      startNumber: 1
     };
   },
   mounted() {
     this.getSkiers();
     this.getRaces();
+    this.cachedRace = data.getCachedRace();
     window.setInterval(() => {
       this.now = new Date();
     }, 333);
@@ -126,34 +144,54 @@ export default {
         if (index > -1) {
           this.selectedRace.skiers.splice(index, 1);
         }
+        data.setCachedRace(this.selectedRace);
       }
     },
 
+    saveCache() {
+      data.setCachedRace(this.selectedRace);
+    },
+
     async addUserToRace() {
-      if (this.addUser._id) {
+      if (this.addUser._id || this.addUser.name) {
         this.selectedRace.skiers.push({
           ...this.addUser,
-          startNumber: this.selectedRace.skiers.length + 1,
+          startNumber: this.startNumber,
           state: 0
         });
       } else if (this.addUser) {
-        await axios.post("api/skiers", { name: this.addUser }).then(response => {
+        await data.createSkier({ name: this.addUser }).then(skier => {
           this.selectedRace.skiers.push({
-            ...response.data,
-            startNumber: this.selectedRace.skiers.length + 1,
+            ...skier,
+            startNumber: this.startNumber,
             state: 0
           });
         });
       }
+      this.startNumber = Number(this.startNumber) + 1;
       this.addUser = "";
+      data.setCachedRace(this.selectedRace);
+    },
+
+    async updateCache() {
+      await data.updateCache();
+      alert("Cache updated!");
+    },
+
+    clearCache() {
+      data.clearCache();
+      alert("Cache cleared");
     },
 
     async saveRace() {
       const race = { ...this.selectedRace };
-
-      await axios.post("api/races", race).then(resp => {
-        this.id = resp.data._id;
+      await data.createRace(race).then(id => {
+        this.id = id;
       });
+    },
+
+    setCachedRace(){
+      data.setCachedRace(this.selectedRace);
     },
 
     async saveRaceAndClose() {
@@ -162,7 +200,7 @@ export default {
     },
 
     async deleteRace() {
-      await axios.delete(`api/races/${this.selectedRace._id}`);
+      await data.deleteRace(this.selectedRace._id);
       await this.getRaces();
     },
 
@@ -170,22 +208,22 @@ export default {
       this.id = null;
     },
 
-    getSkiers() {
-      axios
-        .get("api/skiers")
-        .then(response => {
-          this.availableSkiers = response.data;
+    async getSkiers() {
+      await data.getSkiers()
+        .then(skiers => {
+          this.availableSkiers = skiers
         })
         .catch(reason => alert(reason));
     },
 
     async getRaces() {
-      const { data } = await axios.get("api/races");
-      this.races = data;
+      const races = await data.getRaces();
+      this.races = races;
     }
   },
   computed: {
     selectedRace() {
+      if(this.cachedRace) return this.cachedRace;
       const race = this.races.find(r => r._id === this.id);
       return race || { _id: null, skiers: [], name: "" };
     },

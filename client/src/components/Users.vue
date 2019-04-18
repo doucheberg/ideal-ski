@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import server from '../server';
 
 export default {
   name: "Users",
@@ -33,17 +33,17 @@ export default {
   },
   methods: {
     deleteUser(id) {
-      axios.delete(`api/skiers/${id}`).then(() => this.getUsers());
+      server.deleteSkier(id).then(() => this.getUsers());
     },
     addUser() {
-      axios.post(`api/skiers/`, { name: this.name }).then(() => {
+      server.createSkier({ name: this.name }).then(() => {
         this.name = "";
         this.getUsers();
       });
     },
     getUsers() {
       this.loading = true;
-      axios.get("api/skiers").then(response => {
+      server.getSkiers().then(response => {
         const users = response.data;
 
         this.users = users.sort((a, b) => {

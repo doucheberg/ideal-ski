@@ -19,7 +19,7 @@
             <th></th>
           </tr>
           <tr v-for="(skier) in skiers" v-bind:key="skier._id" :class="`state-${skier.state}`">
-            <td>{{skier.startNumber}}</td>
+            <td><input type="number" v-model="skier.startNumber" @change="$emit('saveState')"></input></td>
             <td>{{skier.position}}</td>
              <td>{{skier.diff}}</td>
             <td>{{skier.name}}</td>
@@ -52,13 +52,11 @@
 </template>
 
 <script>
-  import axios from 'axios';
   
   export default {
     name: 'Race',
     data() {
       return {
-        rawSkiers: [],
         loading: false,
         now: new Date(),
         sort: 'nr',
@@ -131,7 +129,7 @@
         if (skier.endTime && skier.roundTime && skier.startTime) {
           skier.diff = this.calculateSecs(skier.endTime - skier.roundTime, skier.roundTime - skier.startTime);
         } else {
-          skier.diff = '000';
+          skier.diff = '999';
         }
   
       },
@@ -161,6 +159,7 @@
         }
         this.updateStats(skier);
         this.updatePositions();
+        this.$emit('saveState');
       },
 
       remove(skier){
