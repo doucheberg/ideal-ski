@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# v3
+# v4
 
 /css/app.1f4f9050.css
 /js/app.cf687777.js
@@ -9,3 +9,6 @@ CACHE MANIFEST
 /js/chunk-vendors.e28f21f6.js.map
 /index.html
 /favicon.ico
+ https://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic|Material+Icons
+ https://fonts.googleapis.com/icon?family=Material+Icons
+ https://idealski.herokuapp.com/css/app.1f4f9050.css
