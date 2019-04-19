@@ -1,16 +1,19 @@
-var AppCachePlugin = require('appcache-webpack-plugin');
-var manifest = new AppCachePlugin({
-  cache: ['*'],
-  network: ['*'],
-  fallback: [],
-  output: 'manifest.appcache'
-})
 
 module.exports = {
-  configureWebpack: {
-    plugins: [
-      manifest
-    ]
+  pwa: {
+    name: 'My App',
+    themeColor: '#4DBA87',
+    msTileColor: '#000000',
+    appleMobileWebAppCapable: 'yes',
+    appleMobileWebAppStatusBarStyle: 'black',
+
+    // configure the workbox plugin
+    workboxPluginMode: 'InjectManifest',
+    workboxOptions: {
+      // swSrc is required in InjectManifest mode.
+      swSrc: 'dev/sw.js',
+      // ...other Workbox options...
+    }
   },
   devServer: {
     proxy: {
