@@ -4,7 +4,7 @@ const renn = require('./models/renn');
 const Skier = require('./models/skier');
 const Race = require('./models/race');
 
-const dbString = "mongodb://paske:StoredInGithubCode2018!@ds033986.mlab.com:33986/paske";
+const dbString = "mongodb+srv://paske:StoredInGithubCode2018!@paske.tnt0l.mongodb.net/paske?retryWrites=true&w=majority";
 mongoose.connect(dbString, { useNewUrlParser: true });
 mongoose.Promise = global.Promise;
 const db = mongoose.connection;
